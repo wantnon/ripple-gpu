@@ -1,10 +1,8 @@
-//
-//  SceneNode.h
-//  HelloWorld
-//
-//  Created by ���� �� on 12-4-18.
-//  Copyright 2012�� chukong-inc. All rights reserved.
-//
+//********************************************************
+//           by yang chao (wantnon) 
+//			 2013-10-20
+//			 blog: http://350479720.qzone.qq.com
+//********************************************************
 
 #ifndef HelloWorld_SceneNode_h
 #define HelloWorld_SceneNode_h

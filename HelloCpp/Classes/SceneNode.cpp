@@ -85,7 +85,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 	}
 
 	//????shader
-	//????updateRipple
+	//updateRipple shader
 	{
 		GLchar * fragSource = (GLchar*) CCString::createWithContentsOfFile(CCFileUtils::sharedFileUtils()->fullPathForFilename("updateRipple.fsh").c_str())->getCString();
 		CCGLProgram* pProgram = new CCGLProgram();
@@ -93,7 +93,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
 		pProgram->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
-		pProgram->link();//bindAttrib??????link
+		pProgram->link();//link must after bindAttribute
 		pProgram->updateUniforms();//????cocos2d-x????uniform????
 		{//?????uniform????
 			uniLoc_texSource = glGetUniformLocation(pProgram->getProgram(),"texSource");
@@ -109,7 +109,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->release();
 		CHECK_GL_ERROR_DEBUG();
 	}
-/*	//????useRippleMapToRenderScene
+/*	//renderRipple shader
 	{
 		GLchar * fragSource = (GLchar*) CCString::createWithContentsOfFile(CCFileUtils::sharedFileUtils()->fullPathForFilename("renderRipple.fsh").c_str())->getCString();
 		CCGLProgram* pProgram = new CCGLProgram();
@@ -117,10 +117,9 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
 		pProgram->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);	
-		pProgram->link();//bindAttrib??????link
+		pProgram->link();//link must after bindAttribute
 		pProgram->updateUniforms();//????cocos2d-x????uniform????
 		{//?????uniform????
-			uniLoc_rippleCenter = glGetUniformLocation(pProgram->getProgram(), "rippleCenter");
 			uniLoc_texSource = glGetUniformLocation(pProgram->getProgram(),"texSource");
 		}
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"renderRipple");
