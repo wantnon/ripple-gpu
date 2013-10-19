@@ -24,15 +24,6 @@ public:
 		program=NULL;
 	}
 };
-/*
-template<typename T>
-void initVectorWithArr(vector<T>&vec,T arr[],int n){
-	vec.resize(n);
-	for(int i=0;i<n;i++){
-		vec[i]=arr[i]
-	}
-
-}*/
 class SceneNode : public CCLayer{
 public:
 	SceneNode() ;
