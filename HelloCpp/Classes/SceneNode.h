@@ -31,6 +31,9 @@ private:
 	
 	GLuint hFBO;
 
+	CCGLProgram*pProgram_updateRipple;
+	CCGLProgram*pProgram_renderRipple;
+
 	float texWidth,texHeight;
 	float step_s,step_t;
     GLuint texSource;

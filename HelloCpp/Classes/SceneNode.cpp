@@ -26,6 +26,9 @@ SceneNode::SceneNode()
 
 	hFBO=0;
 
+	pProgram_updateRipple=NULL;
+	pProgram_renderRipple=NULL;
+
 	touchPos=CCPoint(-1,-1);
 	touchValid=false;
 }
@@ -107,6 +110,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 		}
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"updateRipple");
 		pProgram->release();
+		pProgram_updateRipple=pProgram;
 		CHECK_GL_ERROR_DEBUG();
 	}
 /*	//renderRipple shader
@@ -124,6 +128,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 		}
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"renderRipple");
 		pProgram->release();
+		pProgram_renderRipple=pProgram;
 		CHECK_GL_ERROR_DEBUG();
 	}*/
 	//????fbo
@@ -156,9 +161,9 @@ void SceneNode::draw()
 		//??fbo
 		GLint oldFBO=0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING,&oldFBO);
-		//oldRBO
-		GLint oldRBO;  
-        glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRBO);  
+	//	//oldRBO
+	//	GLint oldRBO;  
+     //   glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRBO);  
 		//??????fbo
 		glBindFramebuffer(GL_FRAMEBUFFER,hFBO);
 		//attach???????
@@ -167,7 +172,7 @@ void SceneNode::draw()
 	//	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 	//	glViewport(0,0,winSize.width,winSize.height); 
 		//----????shader
-		this->setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey("updateRipple"));
+		this->setShaderProgram(pProgram_updateRipple);
 		ccGLEnable(m_eGLServerState); 	
 		//??cocos2d-x????uniform?
         getShaderProgram()->use(); 
@@ -191,8 +196,8 @@ void SceneNode::draw()
 		//draw
 		_indexVBO->setPointers();
 		_indexVBO->draw(GL_TRIANGLES);  
-		//recover oldRBO
-		glBindRenderbuffer(GL_RENDERBUFFER, oldRBO);  
+	//	//recover oldRBO
+	//	glBindRenderbuffer(GL_RENDERBUFFER, oldRBO);  
 		//???????fbo
 		glBindFramebuffer(GL_FRAMEBUFFER,oldFBO);
 	//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
