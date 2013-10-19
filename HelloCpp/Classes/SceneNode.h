@@ -34,6 +34,7 @@ private:
 	GLuint hFBO;
 
 	float texWidth,texHeight;
+	float step_s,step_t;
     GLuint texSource;
 	GLuint texDest;
 	GLuint texTemp;
@@ -42,8 +43,8 @@ private:
 	GLint uniLoc_texSource;
 	GLint uniLoc_texDest;
 	GLint uniLoc_texTemp;
-	GLint uniLoc_texWidth;
-	GLint uniLoc_texHeight;
+	GLint uniLoc_step_s;
+	GLint uniLoc_step_t;
 	GLint uniLoc_touchPos;
 	GLint uniLoc_touchValid;
 

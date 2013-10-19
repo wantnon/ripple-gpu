@@ -11,6 +11,8 @@ SceneNode::SceneNode()
 {
 	texWidth=256;
 	texHeight=256;
+	step_s=1.0/texWidth;
+	step_t=1.0/texHeight;
 
 	texSource=0;
 	texDest=0;
@@ -19,8 +21,8 @@ SceneNode::SceneNode()
 	uniLoc_texSource=-100;
 	uniLoc_texDest=-100;
 	uniLoc_texTemp=-100;
-	uniLoc_texWidth=-100;
-	uniLoc_texHeight=-100;
+	uniLoc_step_s=-100;
+	uniLoc_step_t=-100;
 
 	hFBO=0;
 
@@ -42,7 +44,7 @@ bool SceneNode::initWithTexture(std::string textureName)
     _texture = CCTextureCache::sharedTextureCache()->addImage(textureName.c_str()) ;//???_texture??retainCount?1
 	//enable touch
 	setTouchEnabled( true );
-	//����texture
+	//????texture
 	{
 		//
 		/*
@@ -52,30 +54,30 @@ bool SceneNode::initWithTexture(std::string textureName)
 		glBindTexture(GL_TEXTURE_2D,0);*/
 		texSource=CCTextureCache::sharedTextureCache()->addImage("texSource_init.png")->getName();
 		glBindTexture(GL_TEXTURE_2D,texSource);
-		//注意：对纹理设置参数至关重要，否则在渲染fbo时产生偏移走样。
-		//GL_NEAREST或GL_LINEAR
+		//ע�⣺���������ò���������Ҫ����������Ⱦfboʱ����ƫ��������
+		//GL_NEAREST��GL_LINEAR
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        //禁止纹理重复
+        //��ֹ�����ظ�
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		//
 		texDest=CCTextureCache::sharedTextureCache()->addImage("texDest_init.png")->getName();
 		glBindTexture(GL_TEXTURE_2D,texDest);
-		//GL_NEAREST或GL_LINEAR
+		//GL_NEAREST��GL_LINEAR
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        //禁止纹理重复
+        //��ֹ�����ظ�
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		//
 		texTemp=CCTextureCache::sharedTextureCache()->addImage("texTemp_init.png")->getName();
 		glBindTexture(GL_TEXTURE_2D,texTemp);
-		//GL_NEAREST或GL_LINEAR
+		//GL_NEAREST��GL_LINEAR
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        //禁止纹理重复
+        //��ֹ�����ظ�
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -97,8 +99,8 @@ bool SceneNode::initWithTexture(std::string textureName)
 			uniLoc_texSource = glGetUniformLocation(pProgram->getProgram(),"texSource");
 			uniLoc_texDest = glGetUniformLocation(pProgram->getProgram(),"texDest");
 			uniLoc_texTemp = glGetUniformLocation(pProgram->getProgram(),"texTemp");
-			uniLoc_texWidth = glGetUniformLocation(pProgram->getProgram(),"texWidth");
-			uniLoc_texHeight = glGetUniformLocation(pProgram->getProgram(),"texHeight");
+			uniLoc_step_s = glGetUniformLocation(pProgram->getProgram(),"step_s");
+			uniLoc_step_t = glGetUniformLocation(pProgram->getProgram(),"step_t");
 			uniLoc_touchPos = glGetUniformLocation(pProgram->getProgram(),"touchPos");
 			uniLoc_touchValid = glGetUniformLocation(pProgram->getProgram(),"touchValid");
 
@@ -158,17 +160,13 @@ void SceneNode::draw()
 		//oldRBO
 		GLint oldRBO;  
         glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRBO);  
-		//??viewport
-	//	GLint oldViewport[4];
-	//	glGetIntegerv(GL_VIEWPORT,oldViewport);
-		//?��???fbo
+		//??????fbo
 		glBindFramebuffer(GL_FRAMEBUFFER,hFBO);
 		//attach???????
 		glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,texTemp,0);
 	//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	//	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 	//	glViewport(0,0,winSize.width,winSize.height); 
-	//	glOrtho(0,texWidth,0,texHeight,-1,1);
 		//----????shader
 		this->setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey("updateRipple"));
 		ccGLEnable(m_eGLServerState); 	
@@ -176,12 +174,12 @@ void SceneNode::draw()
         getShaderProgram()->use(); 
         getShaderProgram()->setUniformsForBuiltins(); 
 		//???????uniform?
-		glUniform1f(uniLoc_texWidth,texWidth);
-		glUniform1f(uniLoc_texHeight,texHeight);
+		glUniform1f(uniLoc_step_s,step_s);
+		glUniform1f(uniLoc_step_t,step_t);
 		float touchPosArray[]={touchPos.x,touchPos.y};
 		glUniform2fv(uniLoc_touchPos,1,touchPosArray);
 		glUniform1i(uniLoc_touchValid,touchValid);
-		touchValid=false;//令touch失效
+		touchValid=false;//��touchʧЧ
 		//?????????
 		glUniform1i(uniLoc_texSource,1);
 		glUniform1i(uniLoc_texDest,2);
@@ -196,12 +194,11 @@ void SceneNode::draw()
 		_indexVBO->draw(GL_TRIANGLES);  
 		//recover oldRBO
 		glBindRenderbuffer(GL_RENDERBUFFER, oldRBO);  
-		//?��????fbo
+		//???????fbo
 		glBindFramebuffer(GL_FRAMEBUFFER,oldFBO);
 	//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		//?��????viewport
-	//	glViewport(oldViewport[0],oldViewport[1],oldViewport[2],oldViewport[3]);
-	//	glOrtho(0,oldViewport[2],0,oldViewport[3],-1,1);
+	//	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+	//	glViewport(0,0,winSize.width,winSize.height); 
 		//draw
 		setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTexture));
 		ccGLEnable(m_eGLServerState);
