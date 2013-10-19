@@ -9,10 +9,10 @@ using namespace std ;
 
 SceneNode::SceneNode()
 {
-	texWidth=256;
-	texHeight=256;
-	step_s=1.0/texWidth;
-	step_t=1.0/texHeight;
+	texWidth=0;
+	texHeight=0;
+	step_s=0;
+	step_t=0;
 
 	texSource=0;
 	texDest=0;
@@ -42,9 +42,14 @@ SceneNode::~SceneNode()
 
 bool SceneNode::initWithTexture(std::string textureName) 
 {
-	glClearColor(1,0,0,1);
+	//glClearColor(1,0,0,1);
 	//create texture
     _texture = CCTextureCache::sharedTextureCache()->addImage(textureName.c_str()) ;//???_texture??retainCount?1
+	CCSize texSize=_texture->getContentSize();
+	texWidth=texSize.width;
+	texHeight=texSize.height;
+	step_s=1.0/texWidth;
+	step_t=1.0/texHeight;
 	//enable touch
 	setTouchEnabled( true );
 	//????texture
