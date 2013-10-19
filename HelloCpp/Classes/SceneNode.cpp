@@ -103,22 +103,13 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
 		pProgram->link();//link must after bindAttribute
 		pProgram->updateUniforms();//????cocos2d-x????uniform????
-		{//?????uniform????
-			uniLoc_texSource = glGetUniformLocation(pProgram->getProgram(),"texSource");
-			uniLoc_texDest = glGetUniformLocation(pProgram->getProgram(),"texDest");
-			uniLoc_texTemp = glGetUniformLocation(pProgram->getProgram(),"texTemp");
-			uniLoc_step_s = glGetUniformLocation(pProgram->getProgram(),"step_s");
-			uniLoc_step_t = glGetUniformLocation(pProgram->getProgram(),"step_t");
-			uniLoc_touchPos = glGetUniformLocation(pProgram->getProgram(),"touchPos");
-			uniLoc_touchValid = glGetUniformLocation(pProgram->getProgram(),"touchValid");
-
-		}
+		
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"updateRipple");
 		pProgram->release();
 		pProgram_updateRipple=pProgram;
 		CHECK_GL_ERROR_DEBUG();
 	}
-/*	//renderRipple shader
+	//renderRipple shader
 	{
 		GLchar * fragSource = (GLchar*) CCString::createWithContentsOfFile(CCFileUtils::sharedFileUtils()->fullPathForFilename("renderRipple.fsh").c_str())->getCString();
 		CCGLProgram* pProgram = new CCGLProgram();
@@ -128,14 +119,12 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);	
 		pProgram->link();//link must after bindAttribute
 		pProgram->updateUniforms();//????cocos2d-x????uniform????
-		{//?????uniform????
-			uniLoc_texSource = glGetUniformLocation(pProgram->getProgram(),"texSource");
-		}
+		
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"renderRipple");
 		pProgram->release();
 		pProgram_renderRipple=pProgram;
 		CHECK_GL_ERROR_DEBUG();
-	}*/
+	}
 	//????fbo
 	glGenFramebuffers(1,&hFBO);
 	//model
@@ -178,10 +167,20 @@ void SceneNode::draw()
 	//	glViewport(0,0,winSize.width,winSize.height); 
 		//----????shader
 		this->setShaderProgram(pProgram_updateRipple);
-		ccGLEnable(m_eGLServerState); 	
+		ccGLEnable(m_eGLServerState);//need optim
 		//??cocos2d-x????uniform?
         getShaderProgram()->use(); 
         getShaderProgram()->setUniformsForBuiltins(); 
+		{//?????uniform????
+			uniLoc_texSource = glGetUniformLocation(getShaderProgram()->getProgram(),"texSource");
+			uniLoc_texDest = glGetUniformLocation(getShaderProgram()->getProgram(),"texDest");
+			uniLoc_texTemp = glGetUniformLocation(getShaderProgram()->getProgram(),"texTemp");
+			uniLoc_step_s = glGetUniformLocation(getShaderProgram()->getProgram(),"step_s");
+			uniLoc_step_t = glGetUniformLocation(getShaderProgram()->getProgram(),"step_t");
+			uniLoc_touchPos = glGetUniformLocation(getShaderProgram()->getProgram(),"touchPos");
+			uniLoc_touchValid = glGetUniformLocation(getShaderProgram()->getProgram(),"touchValid");
+
+		}
 		//???????uniform?
 		glUniform1f(uniLoc_step_s,step_s);
 		glUniform1f(uniLoc_step_t,step_t);
@@ -197,7 +196,7 @@ void SceneNode::draw()
         glBindTexture(GL_TEXTURE_2D, texSource);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, texDest);
-        glActiveTexture(GL_TEXTURE0);//???texture0
+        glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 		//draw
 		_indexVBO->setPointers();
 		_indexVBO->draw(GL_TRIANGLES);  
@@ -208,7 +207,8 @@ void SceneNode::draw()
 	//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	//	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 	//	glViewport(0,0,winSize.width,winSize.height); 
-		//draw
+
+	/*	//draw
 		setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTexture));
 		ccGLEnable(m_eGLServerState);
 		getShaderProgram()->use(); 
@@ -218,6 +218,33 @@ void SceneNode::draw()
 		_indexVBO->setPointers();
 		_indexVBO->draw(GL_TRIANGLES);
 		glBindTexture(GL_TEXTURE_2D,0);
+		*/
+
+		this->setShaderProgram(pProgram_renderRipple);
+		ccGLEnable(m_eGLServerState);//need optim
+		getShaderProgram()->use(); 
+        getShaderProgram()->setUniformsForBuiltins(); 
+		{//?????uniform????
+			uniLoc_texSource = glGetUniformLocation(getShaderProgram()->getProgram(),"texSource");
+			uniLoc_step_s = glGetUniformLocation(getShaderProgram()->getProgram(),"step_s");
+			uniLoc_step_t = glGetUniformLocation(getShaderProgram()->getProgram(),"step_t");
+		}
+		//???????uniform?
+		glUniform1f(uniLoc_step_s,step_s);
+		glUniform1f(uniLoc_step_t,step_t);
+		//pass texture attach point uniform value
+		glUniform1i(uniLoc_texSource,1);
+		//attach texture to texture attach point
+		glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texSource);
+        glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
+		glBindTexture(GL_TEXTURE_2D,_texture->getName());
+		//draw
+		_indexVBO->setPointers();
+		_indexVBO->draw(GL_TRIANGLES);
+		glBindTexture(GL_TEXTURE_2D,0);
+
+
 	
 
 

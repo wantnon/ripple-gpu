@@ -4,7 +4,7 @@
 precision mediump float;
 #endif
 
-varying highp vec2 v_texCoord;
+varying vec2 v_texCoord;
 
 uniform sampler2D CC_Texture0;
 uniform sampler2D texSource;
