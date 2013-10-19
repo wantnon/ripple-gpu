@@ -8,10 +8,22 @@
 #define HelloWorld_SceneNode_h
 #include "cocos2d.h"
 
+#include<iostream>
+#include<map>
+using namespace std;
 
 #include "indexVBO.h"
 using namespace cocos2d;
-
+//if program1 and program2 have a uniform variable with the same name, the two variable's uniform ID (GLint) may be different. 
+//so safe way is let each shader program hold his own uniform IDs.
+class CGLProgramWithMyUnifos{
+public:
+	map<string,GLint> myUnifoMap;
+	CCGLProgram*program;
+	CGLProgramWithMyUnifos(){
+		program=NULL;
+	}
+};
 class SceneNode : public CCLayer{
 public:
 	SceneNode() ;
@@ -31,8 +43,8 @@ private:
 	
 	GLuint hFBO;
 
-	CCGLProgram*pProgram_updateRipple;
-	CCGLProgram*pProgram_renderRipple;
+	CGLProgramWithMyUnifos program_updateRipple;
+	CGLProgramWithMyUnifos program_renderRipple;
 
 	float texWidth,texHeight;
 	float step_s,step_t;
@@ -40,14 +52,7 @@ private:
 	GLuint texDest;
 	GLuint texTemp;
 
-	
-	GLint uniLoc_texSource;
-	GLint uniLoc_texDest;
-	GLint uniLoc_texTemp;
-	GLint uniLoc_step_s;
-	GLint uniLoc_step_t;
-	GLint uniLoc_touchPos;
-	GLint uniLoc_touchValid;
+
 
 
 };

@@ -2,6 +2,7 @@
 
 #include "SceneNode.h"
 #include <iostream>
+#include <map>
 #include "support/ccUtils.h"
 
 using namespace cocos2d ;
@@ -18,16 +19,7 @@ SceneNode::SceneNode()
 	texDest=0;
 	texTemp=0;
 
-	uniLoc_texSource=-100;
-	uniLoc_texDest=-100;
-	uniLoc_texTemp=-100;
-	uniLoc_step_s=-100;
-	uniLoc_step_t=-100;
-
 	hFBO=0;
-
-	pProgram_updateRipple=NULL;
-	pProgram_renderRipple=NULL;
 
 	touchPos=CCPoint(-1,-1);
 	touchValid=false;
@@ -103,10 +95,19 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
 		pProgram->link();//link must after bindAttribute
 		pProgram->updateUniforms();//????cocos2d-x????uniform????
-		
+		map<string,GLint> myUnifoMap;
+		{
+			myUnifoMap["texSource"] =glGetUniformLocation(pProgram->getProgram(),"texSource");
+			myUnifoMap["texDest"] = glGetUniformLocation(pProgram->getProgram(),"texDest");
+			myUnifoMap["step_s"] = glGetUniformLocation(pProgram->getProgram(),"step_s");
+			myUnifoMap["step_t"] = glGetUniformLocation(pProgram->getProgram(),"step_t");
+			myUnifoMap["touchPos"] = glGetUniformLocation(pProgram->getProgram(),"touchPos");
+			myUnifoMap["touchValid"] = glGetUniformLocation(pProgram->getProgram(),"touchValid");
+		}
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"updateRipple");
 		pProgram->release();
-		pProgram_updateRipple=pProgram;
+		program_updateRipple.program=pProgram;
+		program_updateRipple.myUnifoMap=myUnifoMap;
 		CHECK_GL_ERROR_DEBUG();
 	}
 	//renderRipple shader
@@ -119,10 +120,16 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);	
 		pProgram->link();//link must after bindAttribute
 		pProgram->updateUniforms();//????cocos2d-x????uniform????
-		
+		map<string,GLint> myUnifoMap;
+		{
+			myUnifoMap["texSource"] = glGetUniformLocation(pProgram->getProgram(),"texSource");
+			myUnifoMap["step_s"] = glGetUniformLocation(pProgram->getProgram(),"step_s");
+			myUnifoMap["step_t"] = glGetUniformLocation(pProgram->getProgram(),"step_t");
+		}
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"renderRipple");
 		pProgram->release();
-		pProgram_renderRipple=pProgram;
+		program_renderRipple.program=pProgram;
+		program_renderRipple.myUnifoMap=myUnifoMap;
 		CHECK_GL_ERROR_DEBUG();
 	}
 	//????fbo
@@ -166,31 +173,21 @@ void SceneNode::draw()
 	//	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 	//	glViewport(0,0,winSize.width,winSize.height); 
 		//----????shader
-		this->setShaderProgram(pProgram_updateRipple);
+		this->setShaderProgram(program_updateRipple.program);
 		ccGLEnable(m_eGLServerState);//need optim
 		//??cocos2d-x????uniform?
         getShaderProgram()->use(); 
         getShaderProgram()->setUniformsForBuiltins(); 
-		{//?????uniform????
-			uniLoc_texSource = glGetUniformLocation(getShaderProgram()->getProgram(),"texSource");
-			uniLoc_texDest = glGetUniformLocation(getShaderProgram()->getProgram(),"texDest");
-			uniLoc_texTemp = glGetUniformLocation(getShaderProgram()->getProgram(),"texTemp");
-			uniLoc_step_s = glGetUniformLocation(getShaderProgram()->getProgram(),"step_s");
-			uniLoc_step_t = glGetUniformLocation(getShaderProgram()->getProgram(),"step_t");
-			uniLoc_touchPos = glGetUniformLocation(getShaderProgram()->getProgram(),"touchPos");
-			uniLoc_touchValid = glGetUniformLocation(getShaderProgram()->getProgram(),"touchValid");
-
-		}
 		//???????uniform?
-		glUniform1f(uniLoc_step_s,step_s);
-		glUniform1f(uniLoc_step_t,step_t);
+		glUniform1f(program_updateRipple.myUnifoMap["step_s"],step_s);
+		glUniform1f(program_updateRipple.myUnifoMap["step_t"],step_t);
 		float touchPosArray[]={touchPos.x,touchPos.y};
-		glUniform2fv(uniLoc_touchPos,1,touchPosArray);
-		glUniform1i(uniLoc_touchValid,touchValid);
+		glUniform2fv(program_updateRipple.myUnifoMap["touchPos"],1,touchPosArray);
+		glUniform1i(program_updateRipple.myUnifoMap["touchValid"],touchValid);
 		touchValid=false;//��touchʧЧ
 		//?????????
-		glUniform1i(uniLoc_texSource,1);
-		glUniform1i(uniLoc_texDest,2);
+		glUniform1i(program_updateRipple.myUnifoMap["texSource"],1);
+		glUniform1i(program_updateRipple.myUnifoMap["texDest"],2);
 		//??????
 		glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texSource);
@@ -220,20 +217,15 @@ void SceneNode::draw()
 		glBindTexture(GL_TEXTURE_2D,0);
 		*/
 
-		this->setShaderProgram(pProgram_renderRipple);
+		this->setShaderProgram(program_renderRipple.program);
 		ccGLEnable(m_eGLServerState);//need optim
 		getShaderProgram()->use(); 
         getShaderProgram()->setUniformsForBuiltins(); 
-		{//?????uniform????
-			uniLoc_texSource = glGetUniformLocation(getShaderProgram()->getProgram(),"texSource");
-			uniLoc_step_s = glGetUniformLocation(getShaderProgram()->getProgram(),"step_s");
-			uniLoc_step_t = glGetUniformLocation(getShaderProgram()->getProgram(),"step_t");
-		}
 		//???????uniform?
-		glUniform1f(uniLoc_step_s,step_s);
-		glUniform1f(uniLoc_step_t,step_t);
+		glUniform1f(program_renderRipple.myUnifoMap["step_s"],step_s);
+		glUniform1f(program_renderRipple.myUnifoMap["step_t"],step_t);
 		//pass texture attach point uniform value
-		glUniform1i(uniLoc_texSource,1);
+		glUniform1i(program_renderRipple.myUnifoMap["texSource"],1);
 		//attach texture to texture attach point
 		glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texSource);
