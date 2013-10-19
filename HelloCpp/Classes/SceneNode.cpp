@@ -21,7 +21,7 @@ SceneNode::SceneNode()
 
 	hFBO=0;
 
-	touchPos=CCPoint(-1,-1);
+	touchPos_winSpace=CCPoint(0,0);
 	touchValid=false;
 }
 
@@ -101,7 +101,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 			myUnifoMap["texDest"] = glGetUniformLocation(pProgram->getProgram(),"texDest");
 			myUnifoMap["step_s"] = glGetUniformLocation(pProgram->getProgram(),"step_s");
 			myUnifoMap["step_t"] = glGetUniformLocation(pProgram->getProgram(),"step_t");
-			myUnifoMap["touchPos"] = glGetUniformLocation(pProgram->getProgram(),"touchPos");
+			myUnifoMap["touchPos_winSpace"] = glGetUniformLocation(pProgram->getProgram(),"touchPos_winSpace");
 			myUnifoMap["touchValid"] = glGetUniformLocation(pProgram->getProgram(),"touchValid");
 		}
 		CCShaderCache::sharedShaderCache()->addProgram(pProgram,"updateRipple");
@@ -137,8 +137,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 	//model
 	float posArray[8]={0,0,texWidth,0,texWidth,texHeight,0,texHeight};
 	int indexArray[6]={0,1,2,2,3,0};
-//	float texCoordArray[8]={0,1,1,1,1,0,0,0};
-	float texCoordArray[8]={0,0,1,0,1,1,0,1};
+
 	//create and init indexVBO
 	CindexVBO::enableAttribArrays();
 	_indexVBO=new CindexVBO();
@@ -146,7 +145,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 	//submit data to vbo
 	_indexVBO->submitPos(posArray,8,GL_STATIC_DRAW);
 	_indexVBO->submitIndex(indexArray,6,GL_STATIC_DRAW);
-	_indexVBO->submitTexCoord(texCoordArray,8,GL_STATIC_DRAW);
+
 	//gl check
 	CHECK_GL_ERROR_DEBUG();
 
@@ -181,8 +180,8 @@ void SceneNode::draw()
 		//???????uniform?
 		glUniform1f(program_updateRipple.myUnifoMap["step_s"],step_s);
 		glUniform1f(program_updateRipple.myUnifoMap["step_t"],step_t);
-		float touchPosArray[]={touchPos.x,touchPos.y};
-		glUniform2fv(program_updateRipple.myUnifoMap["touchPos"],1,touchPosArray);
+		float touchPosArray[]={touchPos_winSpace.x,touchPos_winSpace.y};
+		glUniform2fv(program_updateRipple.myUnifoMap["touchPos_winSpace"],1,touchPosArray);
 		glUniform1i(program_updateRipple.myUnifoMap["touchValid"],touchValid);
 		touchValid=false;//��touchʧЧ
 		//?????????
@@ -195,6 +194,10 @@ void SceneNode::draw()
         glBindTexture(GL_TEXTURE_2D, texDest);
         glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 		//draw
+		{
+			float texCoordArray[8]={0,0,1,0,1,1,0,1};
+			_indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
+		}
 		_indexVBO->setPointers();
 		_indexVBO->draw(GL_TRIANGLES);  
 	//	//recover oldRBO
@@ -232,6 +235,10 @@ void SceneNode::draw()
         glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 		glBindTexture(GL_TEXTURE_2D,_texture->getName());
 		//draw
+		{
+			float texCoordArray[8]={0,1,1,1,1,0,0,0};
+			_indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
+		}
 		_indexVBO->setPointers();
 		_indexVBO->draw(GL_TRIANGLES);
 		glBindTexture(GL_TEXTURE_2D,0);
@@ -268,10 +275,9 @@ void SceneNode::ccTouchesEnded(CCSet* touches, CCEvent* event)
         if(!touch)
             break;
         
-        CCPoint location = touch->getLocationInView();
+        CCPoint loc_winSpace = touch->getLocationInView();
         
-        location = CCDirector::sharedDirector()->convertToGL(location);
-    //    cout<<"mos pos:"<<location.x<<" "<<location.y<<endl;
+        CCPoint loc_GLSpace = CCDirector::sharedDirector()->convertToGL(loc_winSpace);
 	
     }
 }
@@ -286,12 +292,12 @@ void SceneNode::ccTouchesMoved(cocos2d::CCSet* touches , cocos2d::CCEvent* event
         if(!touch)
             break;
         
-        CCPoint location = touch->getLocationInView();
+        CCPoint loc_winSpace = touch->getLocationInView();
         
-        location = CCDirector::sharedDirector()->convertToGL(location);
-    //    cout<<"mos pos:"<<location.x<<" "<<location.y<<endl;
-		if(location.x>0&&location.x<texWidth&&location.y>0&&location.y<texHeight){
-			touchPos=location;
+        CCPoint loc_GLSpace = CCDirector::sharedDirector()->convertToGL(loc_winSpace);
+
+		if(loc_winSpace.x>0&&loc_winSpace.x<texWidth&&loc_winSpace.y>0&&loc_winSpace.y<texHeight){
+			touchPos_winSpace=loc_winSpace;
 			touchValid=true;
 		}
 		
@@ -309,12 +315,12 @@ void SceneNode::ccTouchesBegan(CCSet* touches, CCEvent* event)
         if(!touch)
             break;
         
-        CCPoint location = touch->getLocationInView();
+		CCPoint loc_winSpace = touch->getLocationInView();
         
-        location = CCDirector::sharedDirector()->convertToGL(location);
-   //     cout<<"mos pos:"<<location.x<<" "<<location.y<<endl;
-		if(location.x>0&&location.x<texWidth&&location.y>0&&location.y<texHeight){
-			touchPos=location;
+        CCPoint loc_GLSpace = CCDirector::sharedDirector()->convertToGL(loc_winSpace);
+
+		if(loc_winSpace.x>0&&loc_winSpace.x<texWidth&&loc_winSpace.y>0&&loc_winSpace.y<texHeight){
+			touchPos_winSpace=loc_winSpace;
 			touchValid=true;
 		}
 	

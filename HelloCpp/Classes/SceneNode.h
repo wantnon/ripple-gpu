@@ -24,6 +24,15 @@ public:
 		program=NULL;
 	}
 };
+/*
+template<typename T>
+void initVectorWithArr(vector<T>&vec,T arr[],int n){
+	vec.resize(n);
+	for(int i=0;i<n;i++){
+		vec[i]=arr[i]
+	}
+
+}*/
 class SceneNode : public CCLayer{
 public:
 	SceneNode() ;
@@ -36,7 +45,7 @@ public:
 	virtual void ccTouchesEnded(cocos2d::CCSet* touches , cocos2d::CCEvent* event);
 
 private:
-	CCPoint touchPos;
+	CCPoint touchPos_winSpace;//origin is window's left up corner
 	bool touchValid;
 	CindexVBO *_indexVBO;
 	CCTexture2D *_texture ;
@@ -51,6 +60,8 @@ private:
     GLuint texSource;
 	GLuint texDest;
 	GLuint texTemp;
+
+
 
 
 

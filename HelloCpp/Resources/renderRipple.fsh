@@ -8,12 +8,8 @@ varying vec2 v_texCoord;
 
 uniform sampler2D CC_Texture0;
 uniform sampler2D texSource;
-uniform sampler2D texDest;
 uniform float step_s;
 uniform float step_t;
-uniform vec2 touchPos_winSpace;
-uniform bool touchValid;
-
 
 void main() {
 
@@ -31,12 +27,12 @@ void main() {
 	float b=texture2D(texSource, dn).r;
 	float c=texture2D(texSource, left).r;
 	float d=texture2D(texSource, right).r;
-	float x=texture2D(texDest,v_texCoord).r;
-    float result=(a+b+c+d-2*x)*0.5;
-	vec2 pos=gl_FragCoord.xy;//fragment's window space coord(origin is window's left up corner)
-	if(touchValid&&abs(pos.x-touchPos_winSpace.x)<3&&abs(pos.y-touchPos_winSpace.y)<3){
-		result+=0.5;
-	}
-	gl_FragColor =vec4(result,result,result,1);
+    // clamp
+  //  float kOneDiv1048= 0.00095419847328244274809160305343511;
+    float s_offset = (c - d)/32;//  kOneDiv1048;
+	float t_offset = (b - a)/32;//  kOneDiv1048;
+	gl_FragColor=texture2D(CC_Texture0,v_texCoord+vec2(s_offset,t_offset));
+
+//	gl_FragColor=texture2D(texSource,v_texCoord);
 }
 
