@@ -41,6 +41,6 @@ void main() {
 	if(touchValid&&abs(pos.x-touchPos_winSpace.x)<3&&abs(pos.y-touchPos_winSpace.y)<3){
 		result+=0.5;
 	}
-	gl_FragColor =vec4(result,result,result,1);
+	gl_FragColor =vec4(result,c-d,b-a,1);
 }
 

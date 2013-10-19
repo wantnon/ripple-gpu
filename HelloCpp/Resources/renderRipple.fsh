@@ -18,25 +18,9 @@ uniform float step_t;
 void main() {
 
     //float time = CC_Time[1];
-	//
-	//     a
-	//   c * d
-	//     b
-	//
-	vec2 up=v_texCoord+vec2(0,-step_t);
-	vec2 dn=v_texCoord+vec2(0,step_t);
-	vec2 left=v_texCoord+vec2(-step_s,0);
-	vec2 right= v_texCoord+vec2(step_s,0);
-	float a=texture2D(texSource, up).r;
-	float b=texture2D(texSource, dn).r;
-	float c=texture2D(texSource, left).r;
-	float d=texture2D(texSource, right).r;
-    // clamp
-  //  float kOneDiv1048= 0.00095419847328244274809160305343511;
-    float s_offset = (c - d)/32;//  kOneDiv1048;
-	float t_offset = (b - a)/32;//  kOneDiv1048;
+    vec2 gb=texture2D(texSource,v_texCoord).gb;//c-d,b-a在updateRipple.fsh中已保存到g和b分量中，所以此处直接取即可
+    float s_offset = gb.x*0.03125;
+	float t_offset = gb.y*0.03125;
 	gl_FragColor=texture2D(CC_Texture0,v_texCoord+vec2(s_offset,t_offset));
-
-//	gl_FragColor=texture2D(texSource,v_texCoord);
 }
 
