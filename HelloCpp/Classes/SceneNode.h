@@ -54,6 +54,8 @@ private:
     CCTexture2D* texSource;
 	CCTexture2D* texDest;
 	CCTexture2D* texTemp;
+public:
+	bool heightMode;
 
 
 

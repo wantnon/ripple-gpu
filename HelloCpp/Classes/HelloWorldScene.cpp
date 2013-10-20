@@ -2,6 +2,9 @@
 #include "AppMacros.h"
 USING_NS_CC;
 #include "SceneNode.h"
+#include "CCControlButton.h"
+using namespace cocos2d;
+
 CCScene* HelloWorld::scene()
 {
     // 'scene' is an autorelease object
@@ -57,6 +60,22 @@ bool HelloWorld::init()
 	sceneNode->setPosition(ccp(0,0));
 //	sceneNode->setAnchorPoint(ccp(0,0));
 	this->addChild(sceneNode);
+	pSceneNode=sceneNode;
+
+
+	 //--switch mode
+    {
+        cocos2d::extension::CCScale9Sprite* btnUp=cocos2d::extension::CCScale9Sprite::create("button.png");
+        cocos2d::extension::CCScale9Sprite* btnDn=cocos2d::extension::CCScale9Sprite::create("button_dn.png");
+        CCLabelTTF*title=CCLabelTTF::create("switch", "Helvetica", 30);
+        cocos2d::extension::CCControlButton* controlButton=cocos2d::extension::CCControlButton::create(title, btnUp);
+        controlButton->setBackgroundSpriteForState(btnDn,cocos2d::extension::CCControlStateHighlighted);
+        controlButton->setPreferredSize(CCSize(100,50));
+        controlButton->setPosition(ccp(100,220));
+        controlButton->addTargetWithActionForControlEvents(this, (cocos2d::extension::SEL_CCControlHandler)(&HelloWorld::switchMode_callBack), cocos2d::extension::CCControlEventTouchDown);
+        
+        this->addChild(controlButton);
+    }
 
 
 
@@ -95,4 +114,8 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
     exit(0);
 #endif
 #endif
+}
+
+void HelloWorld::switchMode_callBack(CCObject *senderz, cocos2d::extension::CCControlEvent controlEvent){
+	pSceneNode->heightMode=!pSceneNode->heightMode;
 }
