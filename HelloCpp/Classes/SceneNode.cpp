@@ -15,7 +15,7 @@ SceneNode::SceneNode()
 	texHeight=0;
 	step_s=0;
 	step_t=0;
-	step_scaleFactor=3;
+	step_scaleFactor=2;
 
 	texSource=NULL;
 	texDest=NULL;
