@@ -38,9 +38,16 @@ void main() {
 	float x=texture2D(texDest,v_texCoord).r;
     float result=(a+b+c+d-2*x)*0.5;
 	vec2 pos=gl_FragCoord.xy;//fragment's window space coord(origin is window's left up corner)
-	if(touchValid&&abs(pos.x-touchPos_winSpace.x)<3&&abs(pos.y-touchPos_winSpace.y)<3){
-		result+=0.5;
+	float R=5.0;
+	float H=0.5;
+	float dis=distance(pos,touchPos_winSpace);
+	if(touchValid&&dis<R){
+		result=H/2*(cos(3.1415926*dis/R)+1);
+
 	}
+//	if(touchValid&&abs(pos.x-touchPos_winSpace.x)<8&&abs(pos.y-touchPos_winSpace.y)<8){
+//		result+=0.5;
+//	}
 	gl_FragColor =vec4(result,c-d,b-a,1);
 }
 
