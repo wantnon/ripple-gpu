@@ -23,6 +23,9 @@ public:
 	CGLProgramWithMyUnifos(){
 		program=NULL;
 	}
+	virtual ~CGLProgramWithMyUnifos(){
+		program->release();
+	}
 };
 class SceneNode : public CCLayer{
 public:
@@ -47,10 +50,10 @@ private:
 	CGLProgramWithMyUnifos program_renderRipple;
 
 	float texWidth,texHeight;
-	float step_s,step_t;
-    GLuint texSource;
-	GLuint texDest;
-	GLuint texTemp;
+	float step_s,step_t,step_scaleFactor;//step_s和step_t进行一定的缩放再传入shader，可以使水波起伏看起来更大些，因为跨度大些梯度就大些
+    CCTexture2D* texSource;
+	CCTexture2D* texDest;
+	CCTexture2D* texTemp;
 
 
 

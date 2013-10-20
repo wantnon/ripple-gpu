@@ -10,14 +10,16 @@ using namespace std ;
 
 SceneNode::SceneNode()
 {
+	_texture=NULL;
 	texWidth=0;
 	texHeight=0;
 	step_s=0;
 	step_t=0;
+	step_scaleFactor=3;
 
-	texSource=0;
-	texDest=0;
-	texTemp=0;
+	texSource=NULL;
+	texDest=NULL;
+	texTemp=NULL;
 
 	hFBO=0;
 
@@ -27,7 +29,14 @@ SceneNode::SceneNode()
 
 SceneNode::~SceneNode()
 {
-	//?????
+	
+	_indexVBO->release();
+	CCTextureCache::sharedTextureCache()->removeTexture(_texture);
+	glDeleteFramebuffers(1,&hFBO);
+	texSource->release();
+	CCTextureCache::sharedTextureCache()->removeTexture(texSource);
+	CCTextureCache::sharedTextureCache()->removeTexture(texDest);
+	CCTextureCache::sharedTextureCache()->removeTexture(texTemp);
 
 }
 
@@ -52,8 +61,8 @@ bool SceneNode::initWithTexture(std::string textureName)
 		glBindTexture(GL_TEXTURE_2D,texSource);
 		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,texWidth,texHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
 		glBindTexture(GL_TEXTURE_2D,0);*/
-		texSource=CCTextureCache::sharedTextureCache()->addImage("texSource_init.png")->getName();
-		glBindTexture(GL_TEXTURE_2D,texSource);
+		texSource=CCTextureCache::sharedTextureCache()->addImage("texSource_init.png");
+		glBindTexture(GL_TEXTURE_2D,texSource->getName());
 		//ע�⣺���������ò���������Ҫ����������Ⱦfboʱ����ƫ��������
 		//GL_NEAREST��GL_LINEAR
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -63,8 +72,8 @@ bool SceneNode::initWithTexture(std::string textureName)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		//
-		texDest=CCTextureCache::sharedTextureCache()->addImage("texDest_init.png")->getName();
-		glBindTexture(GL_TEXTURE_2D,texDest);
+		texDest=CCTextureCache::sharedTextureCache()->addImage("texDest_init.png");
+		glBindTexture(GL_TEXTURE_2D,texDest->getName());
 		//GL_NEAREST��GL_LINEAR
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -72,8 +81,8 @@ bool SceneNode::initWithTexture(std::string textureName)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		//
-		texTemp=CCTextureCache::sharedTextureCache()->addImage("texTemp_init.png")->getName();
-		glBindTexture(GL_TEXTURE_2D,texTemp);
+		texTemp=CCTextureCache::sharedTextureCache()->addImage("texTemp_init.png");
+		glBindTexture(GL_TEXTURE_2D,texTemp->getName());
 		//GL_NEAREST��GL_LINEAR
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -167,7 +176,7 @@ void SceneNode::draw()
 		//??????fbo
 		glBindFramebuffer(GL_FRAMEBUFFER,hFBO);
 		//attach???????
-		glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,texTemp,0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,texTemp->getName(),0);
 	//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	//	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 	//	glViewport(0,0,winSize.width,winSize.height); 
@@ -178,8 +187,8 @@ void SceneNode::draw()
         getShaderProgram()->use(); 
         getShaderProgram()->setUniformsForBuiltins(); 
 		//???????uniform?
-		glUniform1f(program_updateRipple.myUnifoMap["step_s"],step_s);
-		glUniform1f(program_updateRipple.myUnifoMap["step_t"],step_t);
+		glUniform1f(program_updateRipple.myUnifoMap["step_s"],step_s*step_scaleFactor);
+		glUniform1f(program_updateRipple.myUnifoMap["step_t"],step_t*step_scaleFactor);
 		float touchPosArray[]={touchPos_winSpace.x,touchPos_winSpace.y};
 		glUniform2fv(program_updateRipple.myUnifoMap["touchPos_winSpace"],1,touchPosArray);
 		glUniform1i(program_updateRipple.myUnifoMap["touchValid"],touchValid);
@@ -189,9 +198,9 @@ void SceneNode::draw()
 		glUniform1i(program_updateRipple.myUnifoMap["texDest"],2);
 		//??????
 		glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texSource);
+		glBindTexture(GL_TEXTURE_2D, texSource->getName());
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, texDest);
+		glBindTexture(GL_TEXTURE_2D, texDest->getName());
         glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 		//draw
 		{
@@ -225,13 +234,13 @@ void SceneNode::draw()
 		getShaderProgram()->use(); 
         getShaderProgram()->setUniformsForBuiltins(); 
 		//???????uniform?
-		glUniform1f(program_renderRipple.myUnifoMap["step_s"],step_s);
-		glUniform1f(program_renderRipple.myUnifoMap["step_t"],step_t);
+		glUniform1f(program_renderRipple.myUnifoMap["step_s"],step_s*step_scaleFactor);
+		glUniform1f(program_renderRipple.myUnifoMap["step_t"],step_t*step_scaleFactor);
 		//pass texture attach point uniform value
 		glUniform1i(program_renderRipple.myUnifoMap["texSource"],1);
 		//attach texture to texture attach point
 		glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texSource);
+        glBindTexture(GL_TEXTURE_2D, texSource->getName());
         glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 		glBindTexture(GL_TEXTURE_2D,_texture->getName());
 		//draw
@@ -251,9 +260,9 @@ void SceneNode::draw()
 	
 	//system("pause");
 	//store
-	GLuint texSource_store=texSource;
-	GLuint texDest_store=texDest;
-	GLuint texTemp_store=texTemp;
+	CCTexture2D* texSource_store=texSource;
+	CCTexture2D* texDest_store=texDest;
+	CCTexture2D* texTemp_store=texTemp;
 	//reassign
 	texSource=texTemp_store;
 	texDest=texSource_store;

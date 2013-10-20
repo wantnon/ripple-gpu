@@ -39,7 +39,7 @@ void main() {
 	float rippleStrength=32.0;
     float result=(a+b+c+d-2*destCenter)*(0.5-0.5/rippleStrength);
 	vec2 pos=gl_FragCoord.xy;//fragment's window space coord(origin is window's left up corner)
-	float R=10.0;
+	float R=20.0;
 	float H=1.0;
 	float dis=distance(pos,touchPos_winSpace);
 	if(touchValid&&dis<R){
