@@ -35,19 +35,17 @@ void main() {
 	float b=texture2D(texSource, dn).r;
 	float c=texture2D(texSource, left).r;
 	float d=texture2D(texSource, right).r;
-	float x=texture2D(texDest,v_texCoord).r;
-    float result=(a+b+c+d-2*x)*0.5;
+	float destCenter=texture2D(texDest,v_texCoord).r;
+	float rippleStrength=32.0;
+    float result=(a+b+c+d-2*destCenter)*(0.5-0.5/rippleStrength);
 	vec2 pos=gl_FragCoord.xy;//fragment's window space coord(origin is window's left up corner)
-	float R=5.0;
-	float H=0.5;
+	float R=10.0;
+	float H=1.0;
 	float dis=distance(pos,touchPos_winSpace);
 	if(touchValid&&dis<R){
-		result=H/2*(cos(3.1415926*dis/R)+1);
+		result=0.5-H/2*(cos(3.1415926*dis/R)+1);//water Horizon is 0.5
 
 	}
-//	if(touchValid&&abs(pos.x-touchPos_winSpace.x)<8&&abs(pos.y-touchPos_winSpace.y)<8){
-//		result+=0.5;
-//	}
 	gl_FragColor =vec4(result,c-d,b-a,1);
 }
 
