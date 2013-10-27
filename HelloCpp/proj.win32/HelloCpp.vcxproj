@@ -58,6 +58,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A\lib;$(LibraryPath)</LibraryPath>
+    <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A\lib;$(LibraryPath)</LibraryPath>
@@ -122,6 +123,7 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\indexVBO.cpp" />
+    <ClCompile Include="..\Classes\myFunc.cpp" />
     <ClCompile Include="..\Classes\SceneNode.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -130,6 +132,7 @@
     <ClInclude Include="..\Classes\AppMacros.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\indexVBO.h" />
+    <ClInclude Include="..\Classes\myFunc.h" />
     <ClInclude Include="..\Classes\SceneNode.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
