@@ -56,8 +56,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     pEGLView->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, kResolutionNoBorder);
 #endif
 
-    
-    vector<string> searchPath;
+     pDirector->setContentScaleFactor(1.0);
+  /*  vector<string> searchPath;
 
     // In this demo, we select resource according to the frame's height.
     // If the resource size is different from design resolution size, you need to set contentScaleFactor.
@@ -89,7 +89,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // set searching path
     CCFileUtils::sharedFileUtils()->setSearchPaths(searchPath);
-	
+	*/
     // turn on display FPS
     pDirector->setDisplayStats(true);
 

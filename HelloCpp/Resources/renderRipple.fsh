@@ -19,8 +19,8 @@ void main() {
 
     //float time = CC_Time[1];
     vec2 gb=texture2D(texSource,v_texCoord).gb;//c-d,b-a在updateRipple.fsh中已保存到g和b分量中，所以此处直接取即可
-    float s_offset = gb.x/8;
-	float t_offset = gb.y/8;
+    float s_offset = gb.x/8.0;
+	float t_offset = gb.y/8.0;
 	gl_FragColor=texture2D(CC_Texture0,v_texCoord+vec2(s_offset,t_offset));
 }
 

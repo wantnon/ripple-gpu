@@ -40,7 +40,7 @@ static AppDelegate s_sharedApplication;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     
     // Override point for customization after application launch.
-
+    
     // Add the view controller's view to the window and display.
     window = [[UIWindow alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
     EAGLView *__glView = [EAGLView viewWithFrame: [window bounds]
@@ -71,6 +71,11 @@ static AppDelegate s_sharedApplication;
     [window makeKeyAndVisible];
 
     [[UIApplication sharedApplication] setStatusBarHidden: YES];
+    
+    //-------------[[by yang chao BEGIN]]
+    //开启多点触摸
+    [__glView setMultipleTouchEnabled:YES];
+     //-------------[[by yang chao END]]
     
     cocos2d::CCApplication::sharedApplication()->run();
     return YES;

@@ -17,15 +17,26 @@ using namespace cocos2d;
 //if program1 and program2 have a uniform variable with the same name, the two variable's uniform ID (GLint) may be different. 
 //so safe way is let each shader program hold his own uniform IDs.
 class CGLProgramWithMyUnifos{
+	CCGLProgram*program;
 public:
 	map<string,GLint> myUnifoMap;
-	CCGLProgram*program;
-	CGLProgramWithMyUnifos(){
+    CGLProgramWithMyUnifos(){
 		program=NULL;
 	}
 	virtual ~CGLProgramWithMyUnifos(){
 		program->release();
 	}
+    void setProgram(CCGLProgram*_program){
+        if(program){
+            program->release();
+        }
+        program=_program;
+        program->retain();
+    }
+    CCGLProgram*getProgram(){
+        return program;
+    }
+
 };
 class SceneNode : public CCLayer{
 public:
@@ -42,18 +53,23 @@ private:
 	CCPoint touchPos_winSpace;//origin is window's left up corner
 	bool touchValid;
 	CindexVBO *_indexVBO;
-	CCTexture2D *_texture ;
+	
 	
 	GLuint hFBO;
 
 	CGLProgramWithMyUnifos program_updateRipple;
 	CGLProgramWithMyUnifos program_renderRipple;
 
-	float texWidth,texHeight;
-	float step_s,step_t,step_scaleFactor;//step_s和step_t进行一定的缩放再传入shader，可以使水波起伏看起来更大些，因为跨度大些梯度就大些
-    CCTexture2D* texSource;
-	CCTexture2D* texDest;
-	CCTexture2D* texTemp;
+	
+	float step_s,step_t;
+    CCTexture2D *texBackGround ;
+    CCTexture2D* bufferTexSource;
+	CCTexture2D* bufferTexDest;
+	CCTexture2D* bufferTexTemp;
+    CCSize bufferTexSize;
+    CCSize winSize;
+    CCSize screenSize;
+    int viewport[4];
 public:
 	bool heightMode;
 

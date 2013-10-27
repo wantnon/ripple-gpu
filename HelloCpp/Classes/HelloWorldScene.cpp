@@ -33,7 +33,7 @@ bool HelloWorld::init()
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
-    /////////////////////////////
+ /*   /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
 
@@ -51,14 +51,15 @@ bool HelloWorld::init()
     CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
     pMenu->setPosition(CCPointZero);
     this->addChild(pMenu, 1);
-
+*/
     /////////////////////////////
     // 3. add your codes below...
-
+CCDirector::sharedDirector()->setDisplayStats(false);
+    
 	SceneNode*sceneNode=new SceneNode();
-	sceneNode->initWithTexture("HelloWorld.png");
+	sceneNode->initWithTexture("HelloWorld_hd.png");
 	sceneNode->setPosition(ccp(0,0));
-//	sceneNode->setAnchorPoint(ccp(0,0));
+	sceneNode->setAnchorPoint(ccp(0,0));
 	this->addChild(sceneNode);
 	pSceneNode=sceneNode;
 
@@ -71,7 +72,7 @@ bool HelloWorld::init()
         cocos2d::extension::CCControlButton* controlButton=cocos2d::extension::CCControlButton::create(title, btnUp);
         controlButton->setBackgroundSpriteForState(btnDn,cocos2d::extension::CCControlStateHighlighted);
         controlButton->setPreferredSize(CCSize(100,50));
-        controlButton->setPosition(ccp(100,220));
+        controlButton->setPosition(ccp(200,220));
         controlButton->addTargetWithActionForControlEvents(this, (cocos2d::extension::SEL_CCControlHandler)(&HelloWorld::switchMode_callBack), cocos2d::extension::CCControlEventTouchDown);
         
         this->addChild(controlButton);
@@ -81,8 +82,8 @@ bool HelloWorld::init()
 
     // add a label shows "Hello World"
     // create and initialize a label
-    
-    CCLabelTTF* pLabel = CCLabelTTF::create("GPU 2D Ripple Effect", "Arial", TITLE_FONT_SIZE);
+ /*
+    CCLabelTTF* pLabel = CCLabelTTF::create("GPU 2D Ripple Effect", "Arial", 32);
     
     // position the label on the center of the screen
     pLabel->setPosition(ccp(origin.x + visibleSize.width/2,
@@ -90,7 +91,7 @@ bool HelloWorld::init()
 
     // add the label as a child to this layer
     this->addChild(pLabel, 1);
-
+*/
     // add "HelloWorld" splash screen"
 /*    CCSprite* pSprite = CCSprite::create("HelloWorld.png");
 
