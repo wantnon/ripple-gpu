@@ -30,18 +30,30 @@ void main() {
 	//   c * d
 	//     b
 	//
-	vec2 up=v_texCoord+vec2(0.0,-step_t);
-	vec2 dn=v_texCoord+vec2(0.0,step_t);
-	vec2 left=v_texCoord+vec2(-step_s,0.0);
-	vec2 right= v_texCoord+vec2(step_s,0.0);
+    //in cocos2d-x, the read in image data is not fliped,
+    //so normal texture's origin is at left top corner,
+    //but FBO's origin is at left bottom corner,
+    //so render to texture cause upside down.
+    //see:http://www.pouet.net/topic.php?which=8966
+    //http://stackoverflow.com/questions/11861336/opengl-es-render-to-textture-appears-upside-down
+    //if we want get upside up render result, two method:
+    //method 1, let the source upside down, then the render result will be upside up.
+    //method 2, in shader, will change texCoord.y to 1-texCoord.y, then the render result will be upside up.
+    //here we use the second method.
+    vec2 texCoord=vec2(v_texCoord.x,1.0-v_texCoord.y);
+    
+	vec2 up=texCoord+vec2(0.0,-step_t);
+	vec2 dn=texCoord+vec2(0.0,step_t);
+	vec2 left=texCoord+vec2(-step_s,0.0);
+	vec2 right= texCoord+vec2(step_s,0.0);
 	float a=texture2D(texSource, up).r-waterHorizon;
 	float b=texture2D(texSource, dn).r-waterHorizon;
 	float c=texture2D(texSource, left).r-waterHorizon;
 	float d=texture2D(texSource, right).r-waterHorizon;
-	float destCenter=texture2D(texDest,v_texCoord).r-waterHorizon;
+	float destCenter=texture2D(texDest,texCoord).r-waterHorizon;
     float rippleStrength=32.0;
     float result=(a+b+c+d-2.0*destCenter)*(0.5-0.5/rippleStrength);
-    vec2 pos=v_texCoord*winSize;//use gl_FragCoord.xy*(winSize.x/bufferTexSize.x) also right. gl_FragCoord is the viewport space coord(origin at left up corner)
+    vec2 pos=texCoord*winSize;//use gl_FragCoord.xy*(winSize.x/bufferTexSize.x) also right. gl_FragCoord is the viewport space coord(origin at left up corner)
 	float R=20.0;
 	float H=1.0;
 	float dis=distance(pos,touchPos_winSpace);

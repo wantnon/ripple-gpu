@@ -145,7 +145,7 @@ bool SceneNode::initWithTexture(std::string textureName)
     // create model
 	float posArray[8]={0,0,winSize.width,0,winSize.width,winSize.height,0,winSize.height};
 	int indexArray[6]={0,1,2,2,3,0};
-    float texCoordArray[8]={0,0,1,0,1,1,0,1};
+    float texCoordArray[8]={0,1,1,1,1,0,0,0};
 	//create indexVBO
 	CindexVBO::enableAttribArrays();
 	_indexVBO=new CindexVBO();
@@ -200,8 +200,6 @@ void SceneNode::draw()
 		glBindTexture(GL_TEXTURE_2D, bufferTexDest->getName());
         glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 		//draw
-        float texCoordArray[8]={0,0,1,0,1,1,0,1};
-        _indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
 		_indexVBO->setPointers();
 		_indexVBO->draw(GL_TRIANGLES);  
 		//restore to old FBO
@@ -219,8 +217,6 @@ void SceneNode::draw()
             //because we know the current active texture attach point is GL_TEXTURE0, so we call bind directly
 			glBindTexture(GL_TEXTURE_2D,bufferTexTemp->getName());
             //draw
-            float texCoordArray[8]={0,1,1,1,1,0,0,0};
-				_indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
 			_indexVBO->setPointers();
 			_indexVBO->draw(GL_TRIANGLES);
 		}else{//if we want to see the final ripple effect
@@ -241,9 +237,7 @@ void SceneNode::draw()
 		    glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 			glBindTexture(GL_TEXTURE_2D,texBackGround->getName());
 			//draw
-            float texCoordArray[8]={0,1,1,1,1,0,0,0};
-            _indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
-			_indexVBO->setPointers();
+            _indexVBO->setPointers();
 			_indexVBO->draw(GL_TRIANGLES);
 		}
 	}
