@@ -7,9 +7,12 @@
 //
 
 #include "myFunc.h"
-#include "support/ccUtils.h"
+#include "support/ccUtils.cpp"//if we use #include "support/ccUtils.cpp", in vs2010 cause linking error "unsolved external symbol".
+
 CCTexture2D* createCCTexture2DWithSize(const CCSize&size,CCTexture2DPixelFormat eFormat,
-                                       float r=0,float g=0,float b=0,float a=0){
+                                       float r=0,float g=0,float b=0,float a=0)//r,g,b,a are range form 0 to 1
+{
+    //the code below is copied from CCRenderTexture::initWithWidthAndHeight, with some modification.
     CCTexture2D* pTexture=NULL;
     void *data = NULL;
     do{
@@ -36,13 +39,17 @@ CCTexture2D* createCCTexture2DWithSize(const CCSize&size,CCTexture2DPixelFormat 
         
         memset(data, 0, (int)(powW * powH * 4));
         
-        //填充颜色
+        //fill data with color value
+        int _r=r*255;
+        int _g=g*255;
+        int _b=b*255;
+        int _a=a*255;
         for(int i=0;i<powH;i++){
             for(int j=0;j<powW;j++){
-                ((char*)data)[(i*powW+j)*4+0]=r;
-                ((char*)data)[(i*powW+j)*4+1]=g;
-                ((char*)data)[(i*powW+j)*4+2]=b;
-                ((char*)data)[(i*powW+j)*4+3]=a;
+                ((char*)data)[(i*powW+j)*4+0]=_r;
+                ((char*)data)[(i*powW+j)*4+1]=_g;
+                ((char*)data)[(i*powW+j)*4+2]=_b;
+                ((char*)data)[(i*powW+j)*4+3]=_a;
             }
         }
         

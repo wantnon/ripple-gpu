@@ -41,17 +41,21 @@ SceneNode::~SceneNode()
 
 bool SceneNode::initWithTexture(std::string textureName) 
 {
-    //screenSize
-    screenSize=CCEGLView::sharedOpenGLView()->getFrameSize();
-    CCLOG("screenSize:%f,%f",screenSize.width,screenSize.height);
     //enable touch
 	setTouchEnabled( true );
     //set projection is 2D (default is 3D)
     CCDirector::sharedDirector()->setProjection(kCCDirectorProjection2D);
-    //get viewport. viewport is calculated by cocos2d-x, so long as we use this viewport, we are no need to worry about the screen Adaptation.
-    glGetIntegerv(GL_VIEWPORT,viewport);
-    //get winSize, winSize is equals to our design resolution. i only need to writting code based on design resolution, and the actual screen size is nothing to do with me.
+    //get adaptedViewport. adaptedViewport is calculated by cocos2d-x
+    //so long as we use this adaptedViewport, we just writting code based on designResolutionSize, no need to worry about the screen adaptation.
+    glGetIntegerv(GL_VIEWPORT,adaptedViewport);
+    //get screenSize
+    //screenSize is the real size of simulator/device screen
+    screenSize=CCEGLView::sharedOpenGLView()->getFrameSize();
+    CCLOG("screenSize:%f,%f",screenSize.width,screenSize.height);
+    //get winSize
+    //winSize is equals to designResolutionSize. we only need to writting code based on designResolutionSize (and forget the real screenSize).
     winSize=CCDirector::sharedDirector()->getWinSize();
+    CCLOG("winSize:%f,%f",winSize.width,winSize.height);
     //determine bufferTexSize based on winSize
     bufferTexSize=CCSize(winSize.width*0.25,winSize.height*0.25);
     //use bufferTexSize to calculate step_s and step_t
@@ -59,9 +63,9 @@ bool SceneNode::initWithTexture(std::string textureName)
 	step_t=1.0/bufferTexSize.height;
 	//create textures
     texBackGround = CCTextureCache::sharedTextureCache()->addImage(textureName.c_str()) ;
-    bufferTexSource=createCCTexture2DWithSize(bufferTexSize,kCCTexture2DPixelFormat_RGBA8888,128,128,128,255);
-    bufferTexDest=createCCTexture2DWithSize(bufferTexSize,kCCTexture2DPixelFormat_RGBA8888,128,128,128,255);
-    bufferTexTemp=createCCTexture2DWithSize(bufferTexSize,kCCTexture2DPixelFormat_RGBA8888,128,128,128,255);
+    bufferTexSource=createCCTexture2DWithSize(bufferTexSize,kCCTexture2DPixelFormat_RGBA8888,0.5,0.5,0.5,1);
+    bufferTexDest=createCCTexture2DWithSize(bufferTexSize,kCCTexture2DPixelFormat_RGBA8888,0.5,0.5,0.5,1);
+    bufferTexTemp=createCCTexture2DWithSize(bufferTexSize,kCCTexture2DPixelFormat_RGBA8888,0.5,0.5,0.5,1);
     //set texture params
     ccGLBindTexture2D(bufferTexSource->getName());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//GL_NEAREST
@@ -90,7 +94,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
         //link  (must after bindAttribute)
 		pProgram->link();
-        //get cocos2d-x build in uniforms
+        //get cocos2d-x build-in uniforms
 		pProgram->updateUniforms();
         //get my own uniforms
 		map<string,GLint> myUnifoMap;
@@ -121,7 +125,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 		pProgram->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
         //link  (must after bindAttribute)
 		pProgram->link();
-        //get cocos2d-x build in uniforms
+        //get cocos2d-x build-in uniforms
 		pProgram->updateUniforms();
         //get my own uniforms
 		map<string,GLint> myUnifoMap;
@@ -160,23 +164,23 @@ void SceneNode::draw()
 {
 	//use bufferTexSource and bufferTexDest to render bufferTexTemp
 	{
-		//----????fbo
-		//??fbo
+		//----render to bufferTexTemp
+		//get old FBO
 		GLint oldFBO=0;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING,&oldFBO);
-		//??????fbo
+		//bind FBO
 		glBindFramebuffer(GL_FRAMEBUFFER,hFBO);
-		//attach???????
+		//attach bufferTexTemp to FBO
 		glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,bufferTexTemp->getName(),0);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        glViewport(0,0,bufferTexSize.width,bufferTexSize.height);
-		//----????shader
+        glViewport(0,0,bufferTexSize.width,bufferTexSize.height);//means, though we draw on a board of designResolutionSize, but the picture will automatically scale into this viewport rect
+		//----change shader and pass uniform values
 		this->setShaderProgram(program_updateRipple.getProgram());
-		ccGLEnable(m_eGLServerState);//need optim
-		//??cocos2d-x????uniform?
+		ccGLEnable(m_eGLServerState);
+		//pass values for cocos2d-x build-in uniforms
         getShaderProgram()->use(); 
         getShaderProgram()->setUniformsForBuiltins(); 
-		//???????uniform?
+		//pass values for my own uniforms
 		glUniform1f(program_updateRipple.myUnifoMap["step_s"],step_s);
 		glUniform1f(program_updateRipple.myUnifoMap["step_t"],step_t);
 		float touchPos_c[]={touchPos_winSpace.x,touchPos_winSpace.y};
@@ -186,51 +190,50 @@ void SceneNode::draw()
         glUniform2fv(program_updateRipple.myUnifoMap["winSize"],1,winSize_c);
         float bufferTexSize_c[]={bufferTexSize.width,bufferTexSize.height};
         glUniform2fv(program_updateRipple.myUnifoMap["bufferTexSize"],1,bufferTexSize_c);
-		touchValid=false;//��touchʧЧ
-		//?????????
+		//pass texture attach point id to sampler uniform
 		glUniform1i(program_updateRipple.myUnifoMap["texSource"],1);
 		glUniform1i(program_updateRipple.myUnifoMap["texDest"],2);
-		//??????
+		//attach texture to texture attach point
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, bufferTexSource->getName());
         glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, bufferTexDest->getName());
         glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 		//draw
-		{
-            
-			float texCoordArray[8]={0,0,1,0,1,1,0,1};
-
-			_indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
-		}
+        float texCoordArray[8]={0,0,1,0,1,1,0,1};
+        _indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
 		_indexVBO->setPointers();
 		_indexVBO->draw(GL_TRIANGLES);  
-		//???????fbo
+		//restore to old FBO
 		glBindFramebuffer(GL_FRAMEBUFFER,oldFBO);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
-		if(heightMode){
+		glViewport(adaptedViewport[0],adaptedViewport[1],adaptedViewport[2],adaptedViewport[3]);//we just draw thing on designResolution board, then the picture will automatically scale into this viewport rect
+		if(heightMode){//if we want to see the height image
+            //----change shader and pass uniform values
 			setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTexture));
 			ccGLEnable(m_eGLServerState);
+            //pass values for cocos2d-x build-in uniforms
 			getShaderProgram()->use();
 			getShaderProgram()->setUniformsForBuiltins();
+            //bind texture
+            //because we know the current active texture attach point is GL_TEXTURE0, so we call bind directly
 			glBindTexture(GL_TEXTURE_2D,bufferTexTemp->getName());
-			{
-				float texCoordArray[8]={0,1,1,1,1,0,0,0};
+            //draw
+            float texCoordArray[8]={0,1,1,1,1,0,0,0};
 				_indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
-			}
 			_indexVBO->setPointers();
 			_indexVBO->draw(GL_TRIANGLES);
-			glBindTexture(GL_TEXTURE_2D,0);
-		}else{
+		}else{//if we want to see the final ripple effect
+            //----change shader and pass uniform values
 			this->setShaderProgram(program_renderRipple.getProgram());
-			ccGLEnable(m_eGLServerState);//need optim
+			ccGLEnable(m_eGLServerState);
+            //pass values for cocos2d-x build-in uniforms
 			getShaderProgram()->use(); 
 		    getShaderProgram()->setUniformsForBuiltins(); 
-			//???????uniform?
+			//pass values for my own uniforms
 			glUniform1f(program_renderRipple.myUnifoMap["step_s"],step_s);
 			glUniform1f(program_renderRipple.myUnifoMap["step_t"],step_t);
-			//pass texture attach point uniform value
+			//pass texture attach point id to sampler uniform
 			glUniform1i(program_renderRipple.myUnifoMap["texSource"],1);
 			//attach texture to texture attach point
 			glActiveTexture(GL_TEXTURE1);
@@ -238,16 +241,13 @@ void SceneNode::draw()
 		    glActiveTexture(GL_TEXTURE0);//back to GL_TEXTURE0
 			glBindTexture(GL_TEXTURE_2D,texBackGround->getName());
 			//draw
-			{
-				float texCoordArray[8]={0,1,1,1,1,0,0,0};
-				_indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
-			}
+            float texCoordArray[8]={0,1,1,1,1,0,0,0};
+            _indexVBO->submitTexCoord(texCoordArray,8,GL_DYNAMIC_DRAW);
 			_indexVBO->setPointers();
 			_indexVBO->draw(GL_TRIANGLES);
-			glBindTexture(GL_TEXTURE_2D,0);
 		}
 	}
-    //reassign bufferTexs
+    //----reassign bufferTexs
 	//store refs
 	CCTexture2D* bufferTexSource_store=bufferTexSource;
 	CCTexture2D* bufferTexDest_store=bufferTexDest;
@@ -261,6 +261,7 @@ void SceneNode::draw()
 }
 void SceneNode::ccTouchesEnded(CCSet* touches, CCEvent* event)
 {
+    touchValid=false;
     CCSize winSize = CCDirector::sharedDirector()->getWinSize();
     
     CCSetIterator it;
@@ -274,7 +275,6 @@ void SceneNode::ccTouchesEnded(CCSet* touches, CCEvent* event)
             break;
         
         CCPoint loc_winSpace = touch->getLocationInView();
-        
         CCPoint loc_GLSpace = CCDirector::sharedDirector()->convertToGL(loc_winSpace);
 	
     }
@@ -293,8 +293,6 @@ void SceneNode::ccTouchesMoved(cocos2d::CCSet* touches , cocos2d::CCEvent* event
             break;
         
         CCPoint loc_winSpace = touch->getLocationInView();
-        
-        CCPoint loc_GLSpace = CCDirector::sharedDirector()->convertToGL(loc_winSpace);
 
 		if(loc_winSpace.x>0&&loc_winSpace.x<winSize.width&&loc_winSpace.y>0&&loc_winSpace.y<winSize.height){
 			touchPos_winSpace=loc_winSpace;
@@ -317,8 +315,8 @@ void SceneNode::ccTouchesBegan(CCSet* touches, CCEvent* event)
         if(!touch)
             break;
         
-		CCPoint loc_winSpace = touch->getLocationInView();
-         CCLOG("loc_winSpace:%f,%f",loc_winSpace.x,loc_winSpace.y);
+        CCPoint loc_winSpace = touch->getLocationInView();
+    //     CCLOG("loc_winSpace:%f,%f",loc_winSpace.x,loc_winSpace.y);
 		if(loc_winSpace.x>0&&loc_winSpace.x<winSize.width&&loc_winSpace.y>0&&loc_winSpace.y<winSize.height){
 			touchPos_winSpace=loc_winSpace;
 			touchValid=true;

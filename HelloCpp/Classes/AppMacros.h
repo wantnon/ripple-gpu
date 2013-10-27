@@ -2,7 +2,7 @@
 #define __APPMACROS_H__
 
 #include "cocos2d.h"
-//…Ëº∆∑÷±Ê¬
+
 static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(1136, 640);
 static string resourceSearchDic="iphone";
 

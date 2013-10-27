@@ -54,17 +54,18 @@ bool HelloWorld::init()
 */
     /////////////////////////////
     // 3. add your codes below...
-CCDirector::sharedDirector()->setDisplayStats(false);
+    CCDirector::sharedDirector()->setDisplayStats(false);//if set this to true, will crash
     
 	SceneNode*sceneNode=new SceneNode();
-	sceneNode->initWithTexture("HelloWorld_hd.png");
+	sceneNode->initWithTexture("HelloWorld_iphone5.png");
 	sceneNode->setPosition(ccp(0,0));
 	sceneNode->setAnchorPoint(ccp(0,0));
 	this->addChild(sceneNode);
+    sceneNode->release();
 	pSceneNode=sceneNode;
 
 
-	 //--switch mode
+	 //--switch button
     {
         cocos2d::extension::CCScale9Sprite* btnUp=cocos2d::extension::CCScale9Sprite::create("button.png");
         cocos2d::extension::CCScale9Sprite* btnDn=cocos2d::extension::CCScale9Sprite::create("button_dn.png");
@@ -82,8 +83,8 @@ CCDirector::sharedDirector()->setDisplayStats(false);
 
     // add a label shows "Hello World"
     // create and initialize a label
- /*
-    CCLabelTTF* pLabel = CCLabelTTF::create("GPU 2D Ripple Effect", "Arial", 32);
+ 
+    CCLabelTTF* pLabel = CCLabelTTF::create("GPU 2D Ripple Effect", "Arial", 45);
     
     // position the label on the center of the screen
     pLabel->setPosition(ccp(origin.x + visibleSize.width/2,
@@ -91,7 +92,7 @@ CCDirector::sharedDirector()->setDisplayStats(false);
 
     // add the label as a child to this layer
     this->addChild(pLabel, 1);
-*/
+
     // add "HelloWorld" splash screen"
 /*    CCSprite* pSprite = CCSprite::create("HelloWorld.png");
 

@@ -69,7 +69,7 @@ private:
     CCSize bufferTexSize;
     CCSize winSize;
     CCSize screenSize;
-    int viewport[4];
+    int adaptedViewport[4];
 public:
 	bool heightMode;
 

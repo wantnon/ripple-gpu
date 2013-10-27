@@ -236,6 +236,7 @@
 		1839B5AD1802B681005EA308 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 781C33B51547F06B00633F88 /* AVFoundation.framework */; };
 		1839B5AE1802B68D005EA308 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 781C33B31547F06B00633F88 /* AudioToolbox.framework */; };
 		1839B5AF1802B6CA005EA308 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 781C33B11547F06B00633F88 /* OpenAL.framework */; };
+		1881FC66181D206C00A610AA /* HelloWorld_iphone5.png in Resources */ = {isa = PBXBuildFile; fileRef = 1881FC65181D206C00A610AA /* HelloWorld_iphone5.png */; };
 		18937C80181BE61A00875757 /* myFunc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18937C7E181BE61A00875757 /* myFunc.cpp */; };
 		189B0C1118169DFE003CDFEE /* button_dn.png in Resources */ = {isa = PBXBuildFile; fileRef = 189B0C0A18169DFE003CDFEE /* button_dn.png */; };
 		189B0C1218169DFE003CDFEE /* button.png in Resources */ = {isa = PBXBuildFile; fileRef = 189B0C0B18169DFE003CDFEE /* button.png */; };
@@ -270,7 +271,6 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
-		57F3CCEB1817B0800050971E /* HelloWorld_hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 57F3CCEA1817B0800050971E /* HelloWorld_hd.png */; };
 		BF1373EF128A898400D9F789 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF492D4B1289302400A09262 /* OpenGLES.framework */; };
 		BF1373F0128A899500D9F789 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF492C21128924A800A09262 /* libxml2.dylib */; };
 		BF1373F1128A899E00D9F789 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF492B6912891AC600A09262 /* libz.dylib */; };
@@ -760,6 +760,7 @@
 		1839B4F118029AC8005EA308 /* spine-cocos2dx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spine-cocos2dx.h"; sourceTree = "<group>"; };
 		1839B4F218029AC8005EA308 /* spine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spine.h; sourceTree = "<group>"; };
 		1839B5A51802B1B1005EA308 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../../cocos2dx/platform/third_party/ios/libraries/libcurl.a; sourceTree = "<group>"; };
+		1881FC65181D206C00A610AA /* HelloWorld_iphone5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HelloWorld_iphone5.png; sourceTree = "<group>"; };
 		18937C7E181BE61A00875757 /* myFunc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = myFunc.cpp; sourceTree = "<group>"; };
 		18937C7F181BE61A00875757 /* myFunc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myFunc.h; sourceTree = "<group>"; };
 		189B0C0A18169DFE003CDFEE /* button_dn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_dn.png; sourceTree = "<group>"; };
@@ -796,7 +797,6 @@
 		1D6058910D05DD3D006BFB54 /* HelloCpp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelloCpp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		57F3CCEA1817B0800050971E /* HelloWorld_hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HelloWorld_hd.png; sourceTree = "<group>"; };
 		781C33B11547F06B00633F88 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		781C33B31547F06B00633F88 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		781C33B51547F06B00633F88 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -1859,9 +1859,9 @@
 				189B0C0C18169DFE003CDFEE /* renderRipple.fsh */,
 				189B0C1018169DFE003CDFEE /* updateRipple.fsh */,
 				18B41E9A1802FEAA007B8CDD /* Icon-57.png */,
+				1881FC65181D206C00A610AA /* HelloWorld_iphone5.png */,
 				18B41E9B1802FEAA007B8CDD /* Icon-72.png */,
 				18B41E9C1802FEAA007B8CDD /* Icon-114.png */,
-				57F3CCEA1817B0800050971E /* HelloWorld_hd.png */,
 				18B41E9D1802FEAA007B8CDD /* Icon-144.png */,
 				18B41E7C1802FC1E007B8CDD /* fonts */,
 				18B41E7E1802FC1E007B8CDD /* ipad */,
@@ -2046,7 +2046,6 @@
 				1839B54918029AC8005EA308 /* sconscript in Resources */,
 				18B41E8D1802FC1E007B8CDD /* Marker Felt.ttf in Resources */,
 				18B41E8E1802FC1E007B8CDD /* CloseNormal.png in Resources */,
-				57F3CCEB1817B0800050971E /* HelloWorld_hd.png in Resources */,
 				18B41E8F1802FC1E007B8CDD /* CloseSelected.png in Resources */,
 				18B41E901802FC1E007B8CDD /* HelloWorld.png in Resources */,
 				18B41E911802FC1E007B8CDD /* CloseNormal.png in Resources */,
@@ -2062,6 +2061,7 @@
 				18B41EA21802FEAA007B8CDD /* Icon-72.png in Resources */,
 				18B41EA31802FEAA007B8CDD /* Icon-114.png in Resources */,
 				18B41EA41802FEAA007B8CDD /* Icon-144.png in Resources */,
+				1881FC66181D206C00A610AA /* HelloWorld_iphone5.png in Resources */,
 				189B0C1118169DFE003CDFEE /* button_dn.png in Resources */,
 				189B0C1218169DFE003CDFEE /* button.png in Resources */,
 			);
