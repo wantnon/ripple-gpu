@@ -66,10 +66,10 @@ private:
     CCTexture2D* bufferTexSource;
 	CCTexture2D* bufferTexDest;
 	CCTexture2D* bufferTexTemp;
-    CCSize bufferTexSize;
-    CCSize winSize;
-    CCSize screenSize;
-    int adaptedViewport[4];
+    CCSize bufferTexSize;//we simulate ripple on small buffer texture and then scale it to match full back ground
+    CCSize winSize;//equals to designResolutionSize
+    CCSize screenSize;//real screen size of simulator/device
+    int adaptedViewport[4];//adaptedViewport is calculated by cocos2d-x based on the resolution policy
 public:
 	bool heightMode;
 

@@ -19,6 +19,7 @@ public:
     
     // implement the "static node()" method manually
     CREATE_FUNC(HelloWorld);
+    
 public:
     void switchMode_callBack(CCObject *senderz, cocos2d::extension::CCControlEvent controlEvent);
 	SceneNode*pSceneNode;

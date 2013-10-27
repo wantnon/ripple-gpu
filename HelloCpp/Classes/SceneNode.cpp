@@ -23,7 +23,7 @@ SceneNode::SceneNode()
 	touchPos_winSpace=CCPoint(0,0);
 	touchValid=false;
 
-	heightMode=true;
+	heightMode=false;
 }
 
 SceneNode::~SceneNode()
@@ -43,7 +43,7 @@ bool SceneNode::initWithTexture(std::string textureName)
 {
     //enable touch
 	setTouchEnabled( true );
-    //set projection is 2D (default is 3D)
+    //set projection is 2D (default is 3D). if use 3D projection, projection error accumulation may cause ripple effect mess.
     CCDirector::sharedDirector()->setProjection(kCCDirectorProjection2D);
     //get adaptedViewport. adaptedViewport is calculated by cocos2d-x
     //so long as we use this adaptedViewport, we just writting code based on designResolutionSize, no need to worry about the screen adaptation.

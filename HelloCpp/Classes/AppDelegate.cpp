@@ -50,12 +50,18 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	CCSize frameSize = pEGLView->getFrameSize();
 
     // Set the design resolution
+    
+    //setDesignResolutionSize function get all screen adaptation job done.
+    //it main job is calculate the viewport and apply it -- reset the viewport is the core secret of screen adaptation,
+    //we just draw things on a imagined window/board of designResolutionSize and then mapping/scale it to the suitable viewport.
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT) || (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
     pEGLView->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, kResolutionShowAll);
 #else
     pEGLView->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, kResolutionNoBorder);
 #endif
 
+    //contentScaleFactor is used to do resource adaptation (adaptation between resourceSize and  designResolutionSize),
+    //it is nothing to do with screen adaptation (adaptation between designResolutionSize and real screenSize)
      pDirector->setContentScaleFactor(1.0);
   /*  vector<string> searchPath;
 
