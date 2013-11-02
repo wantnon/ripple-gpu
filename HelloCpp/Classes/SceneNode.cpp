@@ -57,7 +57,7 @@ bool SceneNode::initWithTexture(std::string textureName)
     winSize=CCDirector::sharedDirector()->getWinSize();
     CCLOG("winSize:%f,%f",winSize.width,winSize.height);
     //determine bufferTexSize based on winSize
-    bufferTexSize=CCSize(winSize.width*0.25,winSize.height*0.25);
+    bufferTexSize=CCSize(winSize.width*0.4,winSize.height*0.4);
     //use bufferTexSize to calculate step_s and step_t
     step_s=1.0/bufferTexSize.width;
 	step_t=1.0/bufferTexSize.height;
