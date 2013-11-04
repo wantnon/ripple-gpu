@@ -25,9 +25,9 @@ public:
 	    m_texCoordArrayLen=0;
 	}
 	virtual ~CindexVBO(){
-		glDeleteBuffers(1, &posBuffer) ;
-		glDeleteBuffers(1, &texCoordBuffer) ;
-		glDeleteBuffers(1, &indexBuffer) ;
+		if(posBuffer!=0)glDeleteBuffers(1, &posBuffer) ;
+		if(texCoordBuffer!=0)glDeleteBuffers(1, &texCoordBuffer) ;
+		if(indexBuffer!=0)glDeleteBuffers(1, &indexBuffer) ;
     
 	}
 	static void enableAttribArrays(){
@@ -53,7 +53,6 @@ public:
 		m_texCoordArrayLen=texCoordArrayLen;
 	    glBindBuffer(GL_ARRAY_BUFFER, texCoordBuffer);
 		glBufferData(GL_ARRAY_BUFFER, texCoordArrayLen*sizeof(float), texCoordArray, usage);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	void submitIndex(const int indexArray[],const int indexArrayLen,GLenum usage){
